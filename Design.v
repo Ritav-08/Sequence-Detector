@@ -20,42 +20,38 @@ module sdFSM1011(
       //Reset
       if(rst_i) begin
          present_state <= S0;
-         dout_o <= 1'b0;
+         dout_o        <= 1'b0;
       end
       //State Transitions
       else begin
-         present_state <= S0; //default
+         present_state <= S0; //default (redundant)
+         dout_o        <= 1'b0; //default
          case(present_state)
-            S0: begin 
+            S0: begin //Reset
                if(data_i) present_state <= S1;
+               else present_state       <= S0;
             end
-            S1: begin 
+            S1: begin //1 Detected already
                if(data_i == 1'b0) present_state <= S2;
+               else               present_state <= S1;
             end
-            S2: begin 
+            S2: begin //10
                if(data_i) present_state <= S3; 
-               else present_state <= S0;
+               else       present_state <= S0;
             end
-            S3: begin 
-               if(data_i) present_state <= S1;
+            S3: begin //101
+               if(data_i) begin 
+                    present_state <= S1;
+                    dout_o        <= 1'b1;
+               end
                else present_state <= S2; 
             end
-            default: ;
-         endcase
-      
-         //Output Generation
-         dout_o <= 1'b0; //default
-         case(present_state)
-            S0: dout_o <= 1'b0;
-            S1: dout_o <= 1'b0;
-            S2: dout_o <= 1'b0;
-            S3: begin 
-               if(data_i) dout_o <= 1'b1; 
-               else dout_o <= 1'b0;
+            default: begin
+               present_state <= S0;
+               dout_o        <= 1'b0;
             end
-            default: ;
          endcase
-      end
-   end
+      end //else block
+   end //always block
    
 endmodule
