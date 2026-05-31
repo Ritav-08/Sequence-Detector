@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module tb_sdFSM1011();
    reg  data_ti;
    reg  rst_ti;
@@ -5,7 +7,7 @@ module tb_sdFSM1011();
    wire dout_to;
 
 //reg(s)
-reg [3:0] d = 4'b0;
+   reg [3:0] stream = 4'b0;
 
 //instantiation
 sdFSM1011 DUT(.data_i (data_ti), 
@@ -34,17 +36,18 @@ initial begin
                 #10 data_ti = 1'b1;
                 #10 data_ti = 1'b1;
       repeat(8) #10 data_ti = $urandom_range(0,1);
+      #5 $finish;
 end //feeding
 
 //registery
 always@(posedge clk_ti) begin
-   d <= {d[2:0], data_ti};
+   stream <= {stream[2:0], data_ti};
 end
 
 //capture
 initial begin
-   $monitor ("Time: %0t, Clk: %b, Rst: %b, IN: %0b, OUT: %b", 
-             $time,      clk_ti,  rst_ti, data_ti, dout_to);
+   $monitor ("Time: %0t, Clk: %b, Rst: %b, Sequence: %0b, Detection: %b", 
+             $time,      clk_ti,  rst_ti,  stream,             dout_to);
    $dumpfile("sdFSM1011.vcd");
    $dumpvars(0, tb_sdFSM1011);
 end
